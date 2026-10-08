@@ -203,6 +203,8 @@
 
         <Button
             android:id="@+id/btnPlay"
+            android:paddingHorizontal="2dp"
+            android:maxLines="2"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="4dp"
@@ -215,6 +217,8 @@
 
         <Button
             android:id="@+id/btnLove"
+            android:paddingHorizontal="2dp"
+            android:maxLines="2"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="4dp"
@@ -227,6 +231,8 @@
 
         <Button
             android:id="@+id/btnDelete"
+            android:paddingHorizontal="2dp"
+            android:maxLines="2"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="4dp"
@@ -239,6 +245,8 @@
 
         <Button
             android:id="@+id/btnTrim"
+            android:paddingHorizontal="2dp"
+            android:maxLines="2"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="4dp"
@@ -251,6 +259,8 @@
 
         <Button
             android:id="@+id/btnShare"
+            android:paddingHorizontal="2dp"
+            android:maxLines="2"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="4dp"
