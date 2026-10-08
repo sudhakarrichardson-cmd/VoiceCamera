@@ -23,3 +23,6 @@ Thumbs.db
 # captures and logs
 *.log
 captures/
+
+# raw device captures (show status bar / device UI); the Play-ready versions are in store/
+store/raw_flip5/

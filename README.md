@@ -79,5 +79,5 @@ Videos are saved to **Movies/VoiceCamera** and photos to **Pictures/VoiceCamera*
 ## Notes
 - Speech recognition is Android's built-in recogniser (Google speech service), set to English (US); it usually needs an internet connection. Some phones play a small "ding" each time listening restarts.
 - Code map: `CommandParser.kt` (sentence -> command, pure Kotlin), `VoiceListener.kt` (speech recogniser with safe restarts), `MainActivity.kt` (CameraX, countdown, recording, UI).
-- Package name is `com.example.voicecamera`; change it (and the folder under `java/`) before publishing to Google Play.
+- Package name is `com.example.voicecamera`; change it (and the folder under `java/`) before publishing to Google Play. Store listing files and the checklist are in `store/` (see `store/PLAY_STORE_GUIDE.md`).
 - Built with: AGP 8.5.2, Gradle 8.7, Kotlin 2.0.0, CameraX 1.4.2, compileSdk 35 / targetSdk 34.

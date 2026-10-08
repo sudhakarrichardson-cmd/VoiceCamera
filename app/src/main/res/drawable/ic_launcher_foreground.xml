@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- camera body with the viewfinder bump -->
     <path android:fillColor="#F0ECE4"
         android:pathData="M30,40 h12 l4,-6 h16 l4,6 h12 a4,4 0 0 1 4,4 v28 a4,4 0 0 1 -4,4 H30 a4,4 0 0 1 -4,-4 V44 a4,4 0 0 1 4,-4 z" />
-    <path android:fillColor="#0A0A0F"
-        android:pathData="M54,58 m-10,0 a10,10 0 1 0 20,0 a10,10 0 1 0 -20,0" />
-    <path android:fillColor="#E85C47"
-        android:pathData="M54,58 m-5,0 a5,5 0 1 0 10,0 a5,5 0 1 0 -10,0" />
+    <!-- lens: gold ring and dark glass -->
+    <path android:fillColor="#E8C547"
+        android:pathData="M39,58 a15,15 0 1 0 30,0 a15,15 0 1 0 -30,0 z" />
+    <path android:fillColor="#161620"
+        android:pathData="M41.8,58 a12.2,12.2 0 1 0 24.4,0 a12.2,12.2 0 1 0 -24.4,0 z" />
+    <!-- microphone in the lens -->
+    <path android:fillColor="#E8C547"
+        android:pathData="M51.4,53.4 a2.6,2.6 0 0 1 5.2,0 V56.8 a2.6,2.6 0 0 1 -5.2,0 z" />
+    <path android:strokeColor="#E8C547" android:strokeWidth="1.4" android:strokeLineCap="round"
+        android:pathData="M48.6,57.4 a5.4,5.4 0 0 0 10.8,0" />
+    <path android:strokeColor="#E8C547" android:strokeWidth="1.4" android:strokeLineCap="round"
+        android:pathData="M54,62.8 L54,65.2 M51.4,65.2 L56.6,65.2" />
+    <!-- red recording dot -->
+    <path android:fillColor="#FF3B30"
+        android:pathData="M30.2,46.2 a3,3 0 1 0 6,0 a3,3 0 1 0 -6,0 z" />
 </vector>
