@@ -3,12 +3,12 @@
 ## Files in this folder (ready to upload)
 | Play Console field | File | Spec check |
 |---|---|---|
-| App icon | `icon/play_icon_512.png` | 512 x 512, 32-bit PNG, ~24 KB (limit 1 MB) |
+| App icon | `icon/play_icon_512.png` | 512 x 512, 32-bit PNG, ~230 KB (limit 1 MB) |
 | Feature graphic | `feature_graphic_1024x500.png` | 1024 x 500, 24-bit PNG, no transparency |
 | Phone screenshots (2 to 8) | `play_phone_screenshots/01_...07_*.png` | 1080 x 1920 (9:16), 24-bit PNG, no transparency |
-| (marketing, optional) | `icon/logo_transparent_1024.png` | logo on a transparent background |
+| Source artwork | `source/` | your original icon (png) and feature graphic (webp) |
 
-The screenshots are real captures from a Galaxy Z Flip5 (app area only, status bar removed), with a caption added by `tools/make_store_assets.py`.
+The screenshots are real captures from a Galaxy Z Flip5 (app area only, status bar removed), with a caption added by `tools/make_store_assets.py` (the icon and feature graphic are your supplied artwork, not generated).
 The raw 1080 x 2640 captures are not committed (Play rejects screens taller than 2:1).
 Tablet (7" / 10") screenshots are optional and not included.
 
