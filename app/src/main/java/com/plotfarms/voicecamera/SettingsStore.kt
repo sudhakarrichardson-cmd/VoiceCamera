@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 import android.content.Context
 

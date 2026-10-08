@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 import android.os.Bundle
 import android.text.Editable
@@ -27,6 +27,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0).padForSystemBars()
         store = SettingsStore(this)
 
         waitInput = findViewById(R.id.waitInput)

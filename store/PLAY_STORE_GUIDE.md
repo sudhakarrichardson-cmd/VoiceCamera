@@ -49,8 +49,8 @@ PRIVACY
 **Tags / keywords:** voice camera, hands-free, timer camera, self timer, video recorder
 
 ## BEFORE YOU CAN PUBLISH (these are not done yet)
-1. **Change the package name.** It is still `com.example.voicecamera`. Google Play does not accept `com.example.*`, and the package name can never be changed after the first upload. Suggestion: `com.plotfarms.voicecamera`.
-2. **Raise the target API level.** The app targets Android 14 (API 34). Play requires new apps to target a recent level (API 35 or 36, depending on the date): check the exact number in Play Console. Moving to 35+ makes Android draw apps edge-to-edge, so the screens need a small layout check.
+1. ~~Change the package name~~ **Done:** the app id is now `com.plotfarms.voicecamera` (it can never be changed after the first upload).
+2. ~~Raise the target API level~~ **Done:** compileSdk and targetSdk are 36, with edge-to-edge insets handled on all three screens.
 3. **Create a signed release bundle (.aab)** with your own upload key. Keep the keystore file and its passwords safe: losing them makes updates very difficult. Turn on **Play App Signing** when you upload.
 4. **Privacy policy URL** (required because the app uses the camera and microphone). It can be a page on plotfarms.com. Say: no accounts, no data collected or sent by the app, media stays on the device, speech recognition is done by Android's Google speech service.
 5. **Data safety form:** the app itself collects nothing. Mention that voice recognition is handled by Google's on-device/online speech service, and that nothing is shared or sold.

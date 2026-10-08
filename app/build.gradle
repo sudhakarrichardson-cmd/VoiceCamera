@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'com.example.voicecamera'
-    compileSdk 35
+    namespace 'com.plotfarms.voicecamera'
+    compileSdk 36
 
     defaultConfig {
-        applicationId "com.example.voicecamera"
+        applicationId "com.plotfarms.voicecamera"
         minSdk 29
-        targetSdk 34
+        targetSdk 36
         versionCode 1
         versionName "1.0"
     }

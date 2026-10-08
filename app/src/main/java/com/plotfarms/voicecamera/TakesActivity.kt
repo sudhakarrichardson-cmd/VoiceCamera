@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 import android.app.RecoverableSecurityException
 import android.content.Context
@@ -86,6 +86,7 @@ class TakesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_takes)
+        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0).padForSystemBars()
         store = TakeStore(this)
 
         video = findViewById(R.id.video)

@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -135,6 +135,7 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0).padForSystemBars()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         takeStore = TakeStore(this)
@@ -221,6 +222,7 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
         val recText = recIndicator.text
 
         setContentView(R.layout.activity_main)
+        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0).padForSystemBars()
         bindViews()
 
         statusView.text = status

@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

@@ -1,4 +1,4 @@
-package com.example.voicecamera
+package com.plotfarms.voicecamera
 
 /** Which camera the user asked for. */
 enum class CameraChoice { FRONT, BACK, TOGGLE }
