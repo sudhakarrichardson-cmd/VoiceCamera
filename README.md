@@ -51,6 +51,7 @@ On the review screen you can:
 - **Play / Pause / Replay** a video (with the usual scrub bar), or look at a photo full size,
 - tap **Love** (or the heart on its row) to mark the ones you like,
 - **Delete** an item (asks to confirm),
+- **Trim** a video (✂): play it, tap **Start here** / **End here** at the right moments (or drag the two sliders), **Preview** only the kept part, then **Save trimmed copy**. The trimmed video is saved as a new take and the original stays untouched,
 - **Record another** to go back to the camera,
 - **Upload** the one you pick: opens Android's share sheet (WhatsApp, Drive, YouTube, e-mail, ...),
 - **Delete all except ❤** to clear everything unloved in one go (asks to confirm, and is disabled until at least one item is marked ❤).

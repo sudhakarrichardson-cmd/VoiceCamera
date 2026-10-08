@@ -19,9 +19,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.MediaController
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -52,6 +54,23 @@ class TakesActivity : AppCompatActivity() {
     private lateinit var shareButton: Button
     private lateinit var cleanupButton: Button
     private lateinit var adapter: TakeAdapter
+
+    // trimming
+    private lateinit var trimButton: Button
+    private lateinit var trimPanel: View
+    private lateinit var trimSummary: TextView
+    private lateinit var trimStartLabel: TextView
+    private lateinit var trimEndLabel: TextView
+    private lateinit var trimStartBar: SeekBar
+    private lateinit var trimEndBar: SeekBar
+    private lateinit var trimPreviewButton: Button
+    private lateinit var trimSaveButton: Button
+    private lateinit var trimmer: VideoTrimmer
+    private var trimming = false
+    private var trimStartMs = 0
+    private var trimEndMs = 0
+    private var trimTotalMs = 0
+    private var previewing = false
 
     private val handler = Handler(Looper.getMainLooper())
     private val io = Executors.newSingleThreadExecutor()
@@ -99,6 +118,16 @@ class TakesActivity : AppCompatActivity() {
         deleteButton = findViewById(R.id.btnDelete)
         shareButton = findViewById(R.id.btnShare)
         cleanupButton = findViewById(R.id.btnCleanup)
+        trimButton = findViewById(R.id.btnTrim)
+        trimPanel = findViewById(R.id.trimPanel)
+        trimSummary = findViewById(R.id.trimSummary)
+        trimStartLabel = findViewById(R.id.trimStartLabel)
+        trimEndLabel = findViewById(R.id.trimEndLabel)
+        trimStartBar = findViewById(R.id.trimStart)
+        trimEndBar = findViewById(R.id.trimEnd)
+        trimPreviewButton = findViewById(R.id.btnTrimPreview)
+        trimSaveButton = findViewById(R.id.btnTrimSave)
+        trimmer = VideoTrimmer(this)
 
         val controller = MediaController(this)
         controller.setAnchorView(video)
@@ -122,6 +151,28 @@ class TakesActivity : AppCompatActivity() {
         cleanupButton.setOnClickListener { confirmCleanup() }
         findViewById<Button>(R.id.btnRecordMore).setOnClickListener { finish() }
 
+        trimButton.setOnClickListener { startTrim() }
+        findViewById<Button>(R.id.btnStartHere).setOnClickListener { setTrimStart(video.currentPosition, seek = false) }
+        findViewById<Button>(R.id.btnEndHere).setOnClickListener { setTrimEnd(video.currentPosition, seek = false) }
+        trimPreviewButton.setOnClickListener { togglePreview() }
+        findViewById<Button>(R.id.btnTrimCancel).setOnClickListener { closeTrim() }
+        trimSaveButton.setOnClickListener { saveTrim() }
+        trimStartBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) { if (fromUser) setTrimStart(value, seek = true) }
+            override fun onStartTrackingTouch(bar: SeekBar) = stopPreview()
+            override fun onStopTrackingTouch(bar: SeekBar) {}
+        })
+        trimEndBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) { if (fromUser) setTrimEnd(value, seek = true) }
+            override fun onStartTrackingTouch(bar: SeekBar) = stopPreview()
+            override fun onStopTrackingTouch(bar: SeekBar) {}
+        })
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (trimming) closeTrim() else { isEnabled = false; onBackPressedDispatcher.onBackPressed() }
+            }
+        })
+
         refresh()
     }
 
@@ -133,6 +184,7 @@ class TakesActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         handler.removeCallbacks(playLabelTicker)
+        stopPreview()
         if (video.isPlaying) video.pause()
     }
 
@@ -140,6 +192,7 @@ class TakesActivity : AppCompatActivity() {
         super.onDestroy()
         video.stopPlayback()
         adapter.shutdown()
+        trimmer.shutdown()
         io.shutdownNow()
     }
 
@@ -318,6 +371,132 @@ class TakesActivity : AppCompatActivity() {
         }
     }
 
+    // ------------------------------------------------------------------ trim
+
+    private fun startTrim() {
+        val take = current()?.takeIf { it.isVideo } ?: return
+        video.pause()
+        trimTotalMs = video.duration.takeIf { it > 0 } ?: take.durationMs.toInt()
+        if (trimTotalMs < 2 * MIN_KEEP_MS) { toast("This video is too short to trim."); return }
+        trimStartMs = 0
+        trimEndMs = trimTotalMs
+        trimStartBar.max = trimTotalMs
+        trimEndBar.max = trimTotalMs
+        trimStartBar.progress = 0
+        trimEndBar.progress = trimTotalMs
+        trimming = true
+        showTrimPanel(true)
+        updateTrimLabels()
+        video.seekTo(1)
+    }
+
+    private fun closeTrim() {
+        stopPreview()
+        if (trimmer.isRunning) trimmer.cancel()
+        handler.removeCallbacks(trimProgressTicker)
+        trimming = false
+        trimSaveButton.isEnabled = true
+        showTrimPanel(false)
+        updateButtons()
+    }
+
+    private fun showTrimPanel(show: Boolean) {
+        trimPanel.visibility = if (show) View.VISIBLE else View.GONE
+        val rest = if (show) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.mainButtons).visibility = rest
+        findViewById<View>(R.id.moreButtons).visibility = rest
+        findViewById<View>(R.id.list).visibility = rest
+    }
+
+    private fun setTrimStart(ms: Int, seek: Boolean) {
+        trimStartMs = ms.coerceIn(0, trimEndMs - MIN_KEEP_MS)
+        trimStartBar.progress = trimStartMs
+        if (seek) video.seekTo(trimStartMs)
+        updateTrimLabels()
+    }
+
+    private fun setTrimEnd(ms: Int, seek: Boolean) {
+        trimEndMs = ms.coerceIn(trimStartMs + MIN_KEEP_MS, trimTotalMs)
+        trimEndBar.progress = trimEndMs
+        if (seek) video.seekTo(trimEndMs)
+        updateTrimLabels()
+    }
+
+    private fun updateTrimLabels() {
+        trimStartLabel.text = "Start  ${preciseTime(trimStartMs)}"
+        trimEndLabel.text = "End  ${preciseTime(trimEndMs)}"
+        trimSummary.text = "Keeps ${preciseTime(trimEndMs - trimStartMs)} of ${preciseTime(trimTotalMs)}"
+    }
+
+    private fun togglePreview() {
+        if (previewing) { stopPreview(); return }
+        video.seekTo(trimStartMs)
+        video.start()
+        previewing = true
+        trimPreviewButton.text = "⏸ Stop"
+        handler.post(previewTicker)
+    }
+
+    private fun stopPreview() {
+        if (!previewing) return
+        previewing = false
+        handler.removeCallbacks(previewTicker)
+        if (video.isPlaying) video.pause()
+        trimPreviewButton.text = "▶ Preview"
+    }
+
+    /** Plays only the kept part: stops by itself at the End marker. */
+    private val previewTicker = object : Runnable {
+        override fun run() {
+            if (!previewing) return
+            if (video.currentPosition >= trimEndMs || !video.isPlaying) {
+                stopPreview()
+                video.seekTo(trimEndMs)
+            } else {
+                handler.postDelayed(this, 60)
+            }
+        }
+    }
+
+    private fun saveTrim() {
+        val take = current() ?: return
+        if (trimStartMs == 0 && trimEndMs >= trimTotalMs - 50) {
+            toast("Move Start or End first, so there is something to cut.")
+            return
+        }
+        stopPreview()
+        trimSaveButton.isEnabled = false
+        trimSummary.text = "Saving…"
+        handler.post(trimProgressTicker)
+        trimmer.trim(
+            source = take.uri,
+            startMs = trimStartMs.toLong(),
+            endMs = trimEndMs.toLong(),
+            onSaved = { uri ->
+                val kept = trimEndMs - trimStartMs
+                closeTrim()
+                refresh()
+                takes.firstOrNull { it.uri == uri }?.let { selectTake(it, play = false) }
+                toast("Saved a ${preciseTime(kept)} copy. The original is still there.")
+            },
+            onFailed = { message ->
+                handler.removeCallbacks(trimProgressTicker)
+                trimSaveButton.isEnabled = true
+                updateTrimLabels()
+                toast("Trim failed: $message")
+            }
+        )
+    }
+
+    private val trimProgressTicker = object : Runnable {
+        override fun run() {
+            if (!trimmer.isRunning) return
+            val percent = trimmer.progressPercent()
+            trimSummary.text = if (percent >= 0) "Saving…  $percent%" else "Saving…"
+            handler.postDelayed(this, 300)
+        }
+    }
+
     // ------------------------------------------------------------------ buttons
 
     private fun updateButtons() {
@@ -327,6 +506,7 @@ class TakesActivity : AppCompatActivity() {
         loveButton.isEnabled = has
         deleteButton.isEnabled = has
         shareButton.isEnabled = has
+        trimButton.isEnabled = take?.isVideo == true
         cleanupButton.isEnabled = takes.any { it.loved } && takes.any { !it.loved }
         playButton.text = when {
             take != null && !take.isVideo -> "🖼\nPhoto"
@@ -340,6 +520,15 @@ class TakesActivity : AppCompatActivity() {
     private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
     companion object {
+        /** The shortest piece that can be kept. */
+        const val MIN_KEEP_MS = 1000
+
+        /** 0:03.4 : used on the trim handles, where tenths of a second matter. */
+        fun preciseTime(ms: Int): String {
+            val tenths = (ms + 50) / 100
+            return String.format(Locale.US, "%d:%02d.%d", tenths / 600, (tenths / 10) % 60, tenths % 10)
+        }
+
         fun formatDuration(ms: Long): String {
             val s = ((ms + 500) / 1000).toInt()
             return String.format(Locale.US, "%d:%02d", s / 60, s % 60)
