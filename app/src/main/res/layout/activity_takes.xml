@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Your takes"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/takeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 videos"
+            android:textColor="@color/dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:background="#FF07070B">
+
+        <VideoView
+            android:id="@+id/video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Photo"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/emptyView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
+            android:text="No videos yet.\nGo back and record one."
+            android:textColor="@color/dim"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/selectedInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:text=""
+        android:textColor="@color/dim"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="4dp">
+
+        <Button
+            android:id="@+id/btnPlay"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/surface2"
+            android:text="▶&#10;Play"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnLove"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/surface2"
+            android:text="🤍&#10;Love"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/surface2"
+            android:text="🗑&#10;Delete"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnShare"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/gold"
+            android:text="⬆&#10;Upload"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="2dp">
+
+        <Button
+            android:id="@+id/btnRecordMore"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/coral"
+            android:text="●  Record another"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnCleanup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/surface2"
+            android:text="Delete all except ❤"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_weight="2"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
+</LinearLayout>

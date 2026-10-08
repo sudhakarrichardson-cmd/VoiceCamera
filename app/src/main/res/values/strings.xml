@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Voice Camera</string>
+    <string name="camera_back">BACK CAMERA</string>
+    <string name="status_start">Starting…</string>
+    <string name="hint_example">Say: “record video after 5 seconds till 30 seconds”, “front camera”, “zoom in”, or “stop”. Pinch to zoom.</string>
+</resources>

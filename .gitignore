@@ -1,0 +1,25 @@
+# Gradle / build output
+.gradle/
+build/
+app/build/
+.kotlin/
+
+# Machine-specific (path to the Android SDK on this PC)
+local.properties
+
+# Android Studio / IDE files
+.idea/
+*.iml
+
+# Signing keys and secrets: never commit these
+*.jks
+*.keystore
+keystore.properties
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# captures and logs
+*.log
+captures/

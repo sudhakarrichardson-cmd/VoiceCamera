@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- soft shading so the controls stay readable over any picture -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_gravity="top"
+        android:background="@drawable/grad_top" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/grad_bottom" />
+
+    <!-- ===== top bar: settings | recording timer | voice ===== -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="top"
+        android:paddingHorizontal="14dp">
+
+        <ImageView
+            android:id="@+id/btnSettings"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/bg_round_dark"
+            android:contentDescription="Settings: default wait and recording length"
+            android:padding="10dp"
+            android:src="@drawable/ic_settings" />
+
+        <TextView
+            android:id="@+id/recIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_rec"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="7dp"
+            android:text="● 0:00"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/btnMic"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end|center_vertical"
+            android:background="@drawable/bg_round_dark"
+            android:contentDescription="Voice control on or off"
+            android:padding="10dp"
+            android:src="@drawable/ic_mic" />
+    </FrameLayout>
+
+    <!-- ===== what the camera is doing / what it heard ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="68dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp">
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:shadowColor="#CC000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:text="@string/status_start"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/heard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:shadowColor="#CC000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:text="@string/hint_example"
+            android:textColor="#E6F0ECE4"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:shadowColor="#99000000"
+        android:shadowDx="0"
+        android:shadowDy="4"
+        android:shadowRadius="16"
+        android:text="5"
+        android:textColor="@color/white"
+        android:textSize="150sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- ===== bottom: zoom, mode, then gallery | shutter | flip ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:id="@+id/zoomRow"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:orientation="horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/modeVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="VIDEO"
+                android:textColor="@color/gold"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/modePhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:padding="10dp"
+                android:text="PHOTO"
+                android:textColor="#B3FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp">
+
+            <!-- last take: tap to review everything -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <FrameLayout
+                    android:id="@+id/btnTakes"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:background="@drawable/bg_thumb"
+                    android:clipToOutline="true"
+                    android:contentDescription="Review your videos and photos">
+
+                    <ImageView
+                        android:id="@+id/thumb"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                    <TextView
+                        android:id="@+id/thumbBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="3dp"
+                        android:background="@drawable/bg_badge"
+                        android:minWidth="20dp"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="1dp"
+                        android:text="0"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- shutter -->
+            <!-- the touch area is 60dp; the drawn button is half the old size (42dp ring, 32dp centre) -->
+            <FrameLayout
+                android:id="@+id/btnShutter"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:contentDescription="Start or stop">
+
+                <View
+                    android:id="@+id/shutterRing"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_shutter_ring" />
+
+                <View
+                    android:id="@+id/shutterInner"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shutter_video" />
+            </FrameLayout>
+
+            <!-- flip camera -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/btnFlip"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/bg_round_dark"
+                    android:contentDescription="Switch between front and back camera"
+                    android:padding="13dp"
+                    android:src="@drawable/ic_flip" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
