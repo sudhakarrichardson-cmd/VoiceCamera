@@ -9,12 +9,16 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.os.StatFs
 import android.os.SystemClock
 import android.provider.MediaStore
 import android.provider.Settings
@@ -33,6 +37,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.CameraState
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -124,6 +129,10 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
     private var recordingStartedAt = 0L
     private var recordingSeconds = 0
     private var foreground = false          // never listen or restart anything while the app is in the background
+    private var focusRequest: AudioFocusRequest? = null   // held while counting down / recording so other audio pauses, like the stock camera
+    private var cameraProblem: String? = null              // set while another app (or a policy) is blocking the camera
+    private var cameraStateLive: LiveData<CameraState>? = null
+    private val cameraStateObserver = Observer<CameraState> { onCameraState(it) }
     private var listeningActive = false     // the microphone is open and waiting for speech right now
 
     private val permissionLauncher =
@@ -266,6 +275,8 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
         handler.removeCallbacksAndMessages(null)
         voice.stop()
         recording?.stop()
+        dropAudioFocus()
+        cameraStateLive?.removeObserver(cameraStateObserver)
         tone?.release()
         tone = null
         io.shutdownNow()
@@ -371,6 +382,36 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
     private fun onCameraBound() {
         flipButton.contentDescription = "Switch to the ${if (useFront) "back" else "front"} camera"
         observeZoom()
+        observeCameraState()
+    }
+
+    /** Tells the person when the camera cannot be opened (used by another app, switched off, ...) instead of showing a black picture. */
+    private fun observeCameraState() {
+        cameraStateLive?.removeObserver(cameraStateObserver)
+        cameraProblem = null
+        cameraStateLive = camera?.cameraInfo?.cameraState?.also { it.observe(this, cameraStateObserver) }
+    }
+
+    private fun onCameraState(cameraState: CameraState) {
+        val error = cameraState.error
+        if (error != null) {
+            val message = when (error.code) {
+                CameraState.ERROR_CAMERA_IN_USE, CameraState.ERROR_MAX_CAMERAS_IN_USE ->
+                    "The camera is being used by another app. Close that app and this one will reconnect by itself."
+                CameraState.ERROR_CAMERA_DISABLED ->
+                    "The camera is switched off (camera privacy toggle or a device policy)."
+                CameraState.ERROR_DO_NOT_DISTURB_MODE_ENABLED ->
+                    "The camera is not available while Do Not Disturb is on."
+                CameraState.ERROR_CAMERA_FATAL_ERROR ->
+                    "The camera has stopped working. Close the app and open it again."
+                else -> "Reconnecting to the camera…"
+            }
+            cameraProblem = message
+            if (state == State.IDLE) setStatus(message)
+        } else if (cameraProblem != null && cameraState.type == CameraState.Type.OPEN) {
+            cameraProblem = null
+            if (state == State.IDLE) setStatus("Ready.")
+        }
     }
 
     private fun onFlip() {
@@ -512,6 +553,18 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
             heardView.text = defaultsHint()
             return
         }
+        val wantsCapture = command.action is CameraAction.Record || command.action is CameraAction.Photo
+        if (wantsCapture) {
+            cameraProblem?.let { setStatus(it); return }
+            val needMb = when (val a = command.action) {
+                is CameraAction.Record -> 50L + a.durationSeconds * 3L        // about 2.3 MB per second at Full HD
+                else -> 30L
+            }
+            if (freeStorageMb() < needMb) {
+                setStatus("Not enough free storage on this phone to ${if (command.action is CameraAction.Photo) "take a photo" else "record"}. Free up some space and try again.")
+                return
+            }
+        }
         val cameraChanged = command.camera != null && command.camera != currentChoice()
         if (command.camera != null && !selectCamera(command.camera)) return
         command.zoom?.let { zoom ->
@@ -531,6 +584,10 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
             null -> {}      // camera switch / zoom only; keep listening
         }
     }
+
+    private fun freeStorageMb(): Long = try {
+        StatFs(Environment.getExternalStorageDirectory().path).availableBytes / (1024 * 1024)
+    } catch (_: Exception) { Long.MAX_VALUE }
 
     private fun onMicButton() {
         if (!hasPermissions()) { permissionLauncher.launch(REQUIRED_PERMISSIONS); return }
@@ -572,8 +629,30 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
 
     // ------------------------------------------------------------------ countdown / actions
 
+    private fun takeAudioFocus() {
+        if (focusRequest != null) return
+        val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            .setOnAudioFocusChangeListener { }
+            .build()
+        val audio = getSystemService(AudioManager::class.java) ?: return
+        if (audio.requestAudioFocus(request) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) focusRequest = request
+    }
+
+    private fun dropAudioFocus() {
+        val request = focusRequest ?: return
+        focusRequest = null
+        getSystemService(AudioManager::class.java)?.abandonAudioFocusRequest(request)
+    }
+
     private fun startCountdown(delaySeconds: Int, then: () -> Unit) {
         voice.stop()                       // free the microphone for the recording
+        takeAudioFocus()
         state = State.COUNTDOWN
         refreshButtons()
         var remaining = delaySeconds
@@ -639,12 +718,19 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
             is VideoRecordEvent.Finalize -> {
                 handler.removeCallbacks(recordingTicker)
                 recording = null
-                val limitReached = event.error == VideoRecordEvent.Finalize.ERROR_DURATION_LIMIT_REACHED
-                if (event.hasError() && !limitReached) {
-                    finishAction("Recording failed (error ${event.error}).")
-                } else {
-                    // stay here and keep listening: take as many as you like, then review them all from the thumbnail
-                    finishAction("Saved a ${formatTime(recordingSeconds.coerceAtMost(elapsedSeconds()))} video. ${reviewHint()}")
+                val kept = formatTime(recordingSeconds.coerceAtMost(elapsedSeconds()))
+                when (event.error) {
+                    VideoRecordEvent.Finalize.ERROR_NONE, VideoRecordEvent.Finalize.ERROR_DURATION_LIMIT_REACHED ->
+                        // stay here and keep listening: take as many as you like, then review them all from the thumbnail
+                        finishAction("Saved a $kept video. ${reviewHint()}")
+                    // the file is still a good video in these cases: keep it and say why it ended early
+                    VideoRecordEvent.Finalize.ERROR_INSUFFICIENT_STORAGE ->
+                        finishAction("The phone ran out of storage. Saved the $kept recorded so far. Free up some space.")
+                    VideoRecordEvent.Finalize.ERROR_SOURCE_INACTIVE ->
+                        finishAction("The camera was taken by another app. Saved the $kept recorded so far.")
+                    VideoRecordEvent.Finalize.ERROR_FILE_SIZE_LIMIT_REACHED ->
+                        finishAction("The video reached the size limit. Saved the $kept recorded so far.")
+                    else -> finishAction("Recording failed (error ${event.error}). The video may not have been saved.")
                 }
             }
             else -> {}
@@ -699,7 +785,8 @@ class MainActivity : AppCompatActivity(), VoiceListener.Callbacks {
         recIndicator.visibility = View.GONE
         state = State.IDLE
         setStatus(message)
-        beep(150)
+        dropAudioFocus()
+        if (foreground) beep(150)
         refreshButtons()
         if (autoListen && foreground && hasPermissions() && cameraProvider != null) {
             handler.postDelayed({ if (state == State.IDLE && autoListen && foreground) voice.start() }, RESUME_LISTEN_MS)

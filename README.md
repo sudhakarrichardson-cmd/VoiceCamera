@@ -62,6 +62,17 @@ Note: Android only lets the app see (and delete) videos it recorded itself; clip
 
 Videos are saved to **Movies/VoiceCamera** and photos to **Pictures/VoiceCamera** (visible in the Gallery).
 
+## Interruptions (handled like the stock camera)
+| Situation | What the app does |
+|---|---|
+| Home button, app switch, screen lock, answering a call (the app leaves the screen) | A running recording is **stopped and saved**; a countdown or photo is cancelled; voice listening pauses and resumes when you come back. No beeps in the background. |
+| Notification shade, heads-up notification, ringing call while the app stays on screen | Nothing stops: the countdown and recording carry on. |
+| Another app takes the camera | Saved up to that point and the screen says so; at start-up it says the camera is in use and reconnects by itself when it is free. Camera off (privacy toggle / policy) and Do Not Disturb are reported too. |
+| Storage nearly full | Refuses to start with a message (needs about 3 MB per second of video plus 50 MB); if it fills up during a recording, the video is stopped and saved. |
+| Music or podcasts playing | Paused while counting down and recording, and handed back afterwards. |
+| Rotating the phone, folding or unfolding, split screen, font or display size change | The screen re-lays out; a recording is not interrupted. |
+| The screen going to sleep | Prevented while the camera screen is open. |
+
 ## How it behaves
 - It starts listening as soon as the app is open and permissions are granted (the voice icon at the top right shows the state; tap it to turn voice control off/on).
 - While a countdown, recording or photo is running it **stops listening** (the video needs the microphone) and resumes automatically afterwards.
