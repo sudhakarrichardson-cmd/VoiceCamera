@@ -15,6 +15,8 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+*.aab
+*.apk
 
 # OS junk
 .DS_Store

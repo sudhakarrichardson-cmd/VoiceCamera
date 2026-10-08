@@ -51,8 +51,8 @@ PRIVACY
 ## BEFORE YOU CAN PUBLISH (these are not done yet)
 1. ~~Change the package name~~ **Done:** the app id is now `com.plotfarms.voicecamera` (it can never be changed after the first upload).
 2. ~~Raise the target API level~~ **Done:** compileSdk and targetSdk are 36, with edge-to-edge insets handled on all three screens.
-3. **Create a signed release bundle (.aab)** with your own upload key. Keep the keystore file and its passwords safe: losing them makes updates very difficult. Turn on **Play App Signing** when you upload.
-4. **Privacy policy URL**: the page is written (`docs/privacy.html`). Fill in the two highlighted spots (developer name, contact email), then publish it at a public address (e.g. GitHub Pages: Settings > Pages > main /docs, giving https://sudhakarrichardson-cmd.github.io/VoiceCamera/privacy.html) and paste that URL in Play Console. Original note: (required because the app uses the camera and microphone). It can be a page on plotfarms.com. Say: no accounts, no data collected or sent by the app, media stays on the device, speech recognition is done by Android's Google speech service.
+3. ~~Create a signed release bundle~~ **Done:** `gradlew bundleRelease` signs with the upload key (see README, Release build). File to upload: `C:/Personnel/2026/Apps/_signing/VoiceCamera/release-1.0/VoiceCamera-1.0-vc1.aab`. Back up the keystore and `keystore.properties`.
+4. ~~Privacy policy URL~~ **Done:** https://plotfarms.com/apps/voice-camera/privacy.html
 5. **Data safety form:** the app itself collects nothing. Mention that voice recognition is handled by Google's on-device/online speech service, and that nothing is shared or sold.
 6. **Content rating questionnaire** (answers: no violence, no user-generated content shared, etc.).
 7. **Personal developer accounts** created after Nov 2023 must run a closed test with at least 12 testers for 14 days before Production access. Check your account type in Play Console.

@@ -86,6 +86,12 @@ Videos are saved to **Movies/VoiceCamera** and photos to **Pictures/VoiceCamera*
    `gradlew assembleDebug` (APK: `app/build/outputs/apk/debug/app-debug.apk`) and `adb install -r` it.
 2. Allow **Camera** and **Microphone** when asked.
 
+### Release build for Google Play
+1. The upload keystore is **not in this repo**. It lives in `C:\Personnel6\Apps\_signing\VoiceCamera\`, and its path and passwords are in `keystore.properties` in this folder (git-ignored). Back both up. Without `keystore.properties` a release build is simply unsigned.
+2. Raise `versionCode` (and `versionName`) in `app/build.gradle` for every upload.
+3. `gradlew bundleRelease` gives `app/build/outputs/bundle/release/app-release.aab` (upload this). Keep `app/build/outputs/mapping/release/mapping.txt` for each upload; Play Console can use it to read crash reports.
+4. Turn on **Play App Signing** when creating the app, so Google holds the final signing key and this key is only the upload key.
+
 `gradlew testDebugUnitTest` runs the 49 tests that check how spoken sentences are understood (`CommandParserTest`).
 
 ## Notes
