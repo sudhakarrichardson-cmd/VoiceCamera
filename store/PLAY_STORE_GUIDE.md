@@ -36,7 +36,7 @@ A REAL CAMERA SCREEN TOO
 
 TAKE SEVERAL, KEEP THE BEST
 • Stay on the camera and keep taking videos and photos by voice.
-• Review them all in one place: play, mark your favorites with a heart, delete the rest in one tap, and share the one you pick.
+• Review them all in one place: play your videos, trim a video to just the part you want (saved as a new copy), mark your favorites with a heart, delete the rest in one tap, and share the one you pick.
 
 YOUR DEFAULTS
 • Choose your usual wait before starting and your usual recording length once; “record video” then uses them. Anything you say out loud still wins.
